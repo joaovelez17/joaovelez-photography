@@ -1,0 +1,53 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Blog — JV Photography">
+  <section class="placeholder container">
+    <p class="mono">— Journal</p>
+    <h1>Coming <em>soon.</em></h1>
+    <p class="intro-text">
+      The journal entries are on their way. First posts will be from Hong Kong and Taiwan.
+    </p>
+    <a href="/" class="back-link">← Back home</a>
+  </section>
+</BaseLayout>
+
+<style>
+  .placeholder {
+    padding: 200px 48px 120px;
+    max-width: 900px;
+  }
+
+  h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(48px, 7vw, 88px);
+    font-weight: 300;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    margin: 24px 0 32px;
+  }
+
+  .intro-text {
+    font-size: 18px;
+    color: var(--text-dim);
+    max-width: 520px;
+    margin-bottom: 48px;
+  }
+
+  .back-link {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border-bottom: 1px solid var(--accent);
+    padding-bottom: 2px;
+  }
+
+  @media (max-width: 768px) {
+    .placeholder {
+      padding: 140px 24px 80px;
+    }
+  }
+</style>

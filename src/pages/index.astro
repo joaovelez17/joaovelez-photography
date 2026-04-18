@@ -1,121 +1,241 @@
 ---
-import { getCollection } from "astro:content";
-import Layout from "@/layouts/Layout.astro";
-import Header from "@/components/Header.astro";
-import Footer from "@/components/Footer.astro";
-import Socials from "@/components/Socials.astro";
-import LinkButton from "@/components/LinkButton.astro";
-import Card from "@/components/Card.astro";
-import getSortedPosts from "@/utils/getSortedPosts";
-import IconRss from "@/assets/icons/IconRss.svg";
-import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
-import { SITE } from "@/config";
-import { SOCIALS } from "@/constants";
-
-const posts = await getCollection("blog");
-
-const sortedPosts = getSortedPosts(posts);
-const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
-const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<Layout>
-  <Header />
-  <main id="main-content" data-layout="index" class="app-layout">
-    <section id="hero" class:list={["pt-8 pb-6", "border-b border-border"]}>
-      <h1 class="my-4 inline-block text-4xl font-bold sm:my-8 sm:text-5xl">
-        Mingalaba
+<BaseLayout title="JV Photography — A travel journal">
+  <section class="hero">
+    <div class="hero-content container">
+      <p class="hero-label">A Travel Journal</p>
+      <h1 class="hero-title">
+        Light, <em>distance,</em><br />
+        and the slow shape<br />
+        of places.
       </h1>
-      <a
-        target="_blank"
-        href="/rss.xml"
-        class="inline-block"
-        aria-label="rss feed"
-        title="RSS Feed"
-      >
-        <IconRss
-          width={20}
-          height={20}
-          class="scale-125 stroke-accent stroke-3 rtl:-rotate-90"
-        />
-        <span class="sr-only">RSS Feed</span>
-      </a>
-
-      <p>
-        AstroPaper is a minimal, responsive, accessible and SEO-friendly Astro
-        blog theme. This theme follows best practices and provides accessibility
-        out of the box. Light and dark mode are supported by default. Moreover,
-        additional color schemes can also be configured.
+      <p class="hero-sub">
+        My travel journal, hope you enjoy it!
       </p>
-      <p class="mt-2">
-        Read the blog posts or check
-        <LinkButton
-          class="underline decoration-dashed underline-offset-4 hover:text-accent"
-          href="https://github.com/satnaing/astro-paper#readme"
-        >
-          README
-        </LinkButton> for more info.
-      </p>
-      {
-        // only display if at least one social link is enabled
-        SOCIALS.length > 0 && (
-          <div class="mt-4 flex max-sm:flex-col sm:items-center">
-            <div class="me-2 mb-1 whitespace-nowrap sm:mb-0">Social Links:</div>
-            <Socials />
-          </div>
-        )
-      }
-    </section>
-
-    {
-      featuredPosts.length > 0 && (
-        <section
-          id="featured"
-          class:list={[
-            "pt-12 pb-6",
-            { "border-b border-border": recentPosts.length > 0 },
-          ]}
-        >
-          <h2 class="text-2xl font-semibold tracking-wide">Featured</h2>
-          <ul>
-            {featuredPosts.map(data => (
-              <Card variant="h3" {...data} />
-            ))}
-          </ul>
-        </section>
-      )
-    }
-
-    {
-      recentPosts.length > 0 && (
-        <section id="recent-posts" class="pt-12 pb-6">
-          <h2 class="text-2xl font-semibold tracking-wide">Recent Posts</h2>
-          <ul>
-            {recentPosts.map(
-              (data, index) =>
-                index < SITE.postPerIndex && <Card variant="h3" {...data} />
-            )}
-          </ul>
-        </section>
-      )
-    }
-
-    <div class="my-8 text-center">
-      <LinkButton href="/posts/">
-        All Posts
-        <IconArrowRight class="inline-block rtl:-rotate-180" />
-      </LinkButton>
+      <div class="hero-actions">
+        <a href="/blog" class="action-link">
+          <span>Read the journal</span>
+          <span class="arrow">→</span>
+        </a>
+        <a href="/gallery" class="action-link">
+          <span>Browse photos</span>
+          <span class="arrow">→</span>
+        </a>
+      </div>
     </div>
-  </main>
-  <Footer />
-</Layout>
+    <div class="hero-backdrop"></div>
+  </section>
 
-<script>
-  document.addEventListener("astro:page-load", () => {
-    const indexLayout = (document.querySelector("#main-content") as HTMLElement)
-      ?.dataset?.layout;
-    if (indexLayout) {
-      sessionStorage.setItem("backUrl", "/");
+  <section class="intro container">
+    <div class="intro-grid">
+      <div class="intro-label mono">— Recent</div>
+      <div class="intro-body">
+        <h2 class="intro-title">
+          Latest <em>travels,</em><br />
+          in long form.
+        </h2>
+        <p class="intro-text">
+          Trip journals with photographs from recent travels. Start with Hong Kong
+          or Taiwan, or dive into the full collection.
+        </p>
+        <a href="/blog" class="intro-link">All journal entries →</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    min-height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 100px;
+    overflow: hidden;
+  }
+
+  .hero-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse at 20% 30%, rgba(140, 168, 150, 0.08), transparent 50%),
+      radial-gradient(ellipse at 80% 70%, rgba(60, 80, 70, 0.15), transparent 50%),
+      linear-gradient(180deg, #0a0a0a 0%, #0f0f0f 50%, #0a0a0a 100%);
+  }
+
+  .hero-backdrop::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(to top, #050505, transparent);
+    clip-path: polygon(
+      0 100%, 0 70%,
+      12% 55%, 22% 65%, 32% 40%,
+      45% 55%, 55% 35%, 68% 50%,
+      80% 30%, 92% 45%, 100% 35%,
+      100% 100%
+    );
+    opacity: 0.6;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+  }
+
+  .hero-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    animation: fadeUp 1s ease-out;
+  }
+
+  .hero-label::before {
+    content: "";
+    width: 40px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .hero-title {
+    font-family: var(--font-serif);
+    font-size: clamp(48px, 7.5vw, 104px);
+    font-weight: 300;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    margin-bottom: 40px;
+    animation: fadeUp 1s ease-out 0.15s both;
+  }
+
+  .hero-sub {
+    font-size: 18px;
+    font-style: italic;
+    color: var(--text-dim);
+    max-width: 480px;
+    margin-bottom: 48px;
+    animation: fadeUp 1s ease-out 0.3s both;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    animation: fadeUp 1s ease-out 0.45s both;
+  }
+
+  .action-link {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    transition: all 0.3s ease;
+  }
+
+  .action-link:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    gap: 18px;
+  }
+
+  .arrow {
+    transition: transform 0.3s ease;
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
     }
-  });
-</script>
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Intro section */
+  .intro {
+    padding: 120px 48px;
+  }
+
+  .intro-grid {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 80px;
+    align-items: baseline;
+  }
+
+  .intro-label {
+    padding-top: 12px;
+  }
+
+  .intro-title {
+    font-family: var(--font-serif);
+    font-size: clamp(32px, 4.5vw, 56px);
+    font-weight: 300;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 32px;
+  }
+
+  .intro-text {
+    font-size: 18px;
+    color: var(--text-dim);
+    max-width: 520px;
+    margin-bottom: 32px;
+    line-height: 1.7;
+  }
+
+  .intro-link {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border-bottom: 1px solid var(--accent);
+    padding-bottom: 2px;
+  }
+
+  .intro-link:hover {
+    color: var(--text);
+    border-bottom-color: var(--text);
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      padding-bottom: 60px;
+    }
+
+    .hero-actions {
+      gap: 20px;
+      flex-direction: column;
+    }
+
+    .intro {
+      padding: 80px 24px;
+    }
+
+    .intro-grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+  }
+</style>
