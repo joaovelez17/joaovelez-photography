@@ -1,0 +1,110 @@
+---
+// Lightbox for photo expansion
+---
+
+<div id="lightbox" class="lightbox" aria-hidden="true">
+  <button class="close" aria-label="Close">×</button>
+  <img id="lightbox-img" src="" alt="" />
+</div>
+
+<script>
+  const lightbox = document.getElementById("lightbox") as HTMLElement;
+  const lightboxImg = document.getElementById("lightbox-img") as HTMLImageElement;
+  const closeBtn = lightbox?.querySelector(".close") as HTMLButtonElement;
+
+  // Find all images in post figures and make them clickable
+  document.querySelectorAll(".post-content figure img").forEach((img) => {
+    const image = img as HTMLImageElement;
+    image.style.cursor = "zoom-in";
+    image.addEventListener("click", () => {
+      lightboxImg.src = image.src;
+      lightboxImg.alt = image.alt;
+      lightbox.classList.add("active");
+      lightbox.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    });
+  });
+
+  const closeLightbox = () => {
+    lightbox.classList.remove("active");
+    lightbox.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  };
+
+  closeBtn?.addEventListener("click", closeLightbox);
+
+  // Click outside image to close
+  lightbox?.addEventListener("click", (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+
+  // Esc key to close
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && lightbox.classList.contains("active")) {
+      closeLightbox();
+    }
+  });
+</script>
+
+<style>
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    padding: 40px;
+  }
+
+  .lightbox.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .lightbox img {
+    max-width: 100%;
+    max-height: 90vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+  }
+
+  .close {
+    position: absolute;
+    top: 24px;
+    right: 32px;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 40px;
+    cursor: pointer;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: color 0.3s;
+  }
+
+  .close:hover {
+    color: var(--accent);
+  }
+
+  @media (max-width: 768px) {
+    .lightbox {
+      padding: 16px;
+    }
+    .close {
+      top: 16px;
+      right: 16px;
+      font-size: 32px;
+    }
+  }
+</style>

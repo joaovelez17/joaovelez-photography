@@ -1,0 +1,276 @@
+---
+import { getCollection, render } from "astro:content";
+import { Image } from "astro:assets";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Lightbox from "../../components/Lightbox.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+const locationSlug = post.data.location.toLowerCase().replace(/\s+/g, "-");
+---
+
+<BaseLayout title={`${post.data.title} — JV Photography`} description={post.data.description}>
+  <article>
+    <header class="post-header container">
+      <div class="meta">
+        <span>{post.data.location}</span>
+        <span class="divider"></span>
+        <span>{formatDate(post.data.pubDate)}</span>
+      </div>
+      <h1>{post.data.title}</h1>
+      <p class="subtitle">{post.data.description}</p>
+      {post.data.readTime && <p class="read-time">{post.data.readTime}</p>}
+    </header>
+
+    <figure class="hero-image">
+      <Image
+        src={post.data.coverImage}
+        alt={post.data.coverAlt}
+        widths={[800, 1400, 2000]}
+        sizes="(max-width: 900px) 100vw, 900px"
+        loading="eager"
+      />
+    </figure>
+
+    <div class="post-content container">
+      <Content />
+    </div>
+
+    <footer class="post-footer container">
+      <a href={`/gallery/${locationSlug}`} class="gallery-link">
+        See all photos from {post.data.location} →
+      </a>
+      <a href="/blog" class="back-link">← All entries</a>
+    </footer>
+  </article>
+
+  <Lightbox />
+</BaseLayout>
+
+<style>
+  article {
+    padding-top: 140px;
+  }
+
+  .post-header {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+    padding-bottom: 60px;
+  }
+
+  .meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .divider {
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(40px, 6vw, 72px);
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 32px;
+  }
+
+  .subtitle {
+    font-size: 20px;
+    color: var(--text-dim);
+    font-style: italic;
+    max-width: 600px;
+    margin: 0 auto 20px;
+  }
+
+  .read-time {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 24px;
+  }
+
+ .hero-image {
+    max-width: 920px;
+    max-height: 90vh;
+    margin: 40px auto 80px;
+    padding: 0 24px;
+    overflow: hidden;
+  }
+
+  .hero-image :global(img) {
+    width: 100%;
+    height: 100%;
+    max-height: 90vh;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .post-content {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .post-content :global(p) {
+    font-size: 19px;
+    line-height: 1.8;
+    margin-bottom: 32px;
+  }
+
+  .post-content :global(h2) {
+    font-family: var(--font-serif);
+    font-size: 36px;
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    margin: 80px 0 32px;
+  }
+
+  .post-content :global(h2 em) {
+    color: var(--accent);
+  }
+
+  .post-content :global(blockquote) {
+    font-size: 26px;
+    font-style: italic;
+    font-weight: 300;
+    line-height: 1.4;
+    padding: 40px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    margin: 64px 0;
+    text-align: center;
+  }
+
+  .post-content :global(figure) {
+    margin: 64px auto;
+    width: 100%;
+    max-width: 900px;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .post-content :global(figure img) {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .post-content :global(figure.full-bleed) {
+    width: 100vw;
+    max-width: 100vw;
+    margin: 96px 0;
+  }
+
+  .post-content :global(figure.full-bleed img) {
+    width: 100%;
+    height: auto;
+    max-height: 90vh;
+    object-fit: contain;
+    display: block;
+  }
+
+  .post-content :global(figcaption) {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 16px;
+    padding: 0 24px;
+  }
+
+  .post-footer {
+    max-width: 720px;
+    margin: 120px auto 0;
+    padding: 48px 24px 0;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+
+  .gallery-link {
+    font-family: var(--font-serif);
+    font-size: 24px;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--accent);
+    border-bottom: 1px solid var(--accent);
+    padding-bottom: 2px;
+  }
+
+  .gallery-link:hover {
+    color: var(--text);
+    border-bottom-color: var(--text);
+  }
+
+  .back-link {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  @media (max-width: 768px) {
+    article {
+      padding-top: 100px;
+    }
+    .post-header {
+      padding: 0 24px 40px;
+    }
+    .hero-image {
+      margin: 24px auto 48px;
+      padding: 0 16px;
+    }
+    .post-content :global(p) {
+      font-size: 17px;
+    }
+    .post-content :global(figure) {
+      margin: 48px auto;
+    }
+    .post-content :global(figure.full-bleed) {
+      margin: 56px 0;
+    }
+    .post-footer {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

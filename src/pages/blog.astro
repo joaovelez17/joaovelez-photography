@@ -1,53 +1,181 @@
 ---
+import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString("en-GB", {
+    month: "long",
+    year: "numeric",
+  });
 ---
 
-<BaseLayout title="Blog — JV Photography">
-  <section class="placeholder container">
+<BaseLayout title="Journal — JV Photography">
+  <section class="header container">
     <p class="mono">— Journal</p>
-    <h1>Coming <em>soon.</em></h1>
-    <p class="intro-text">
-      The journal entries are on their way. First posts will be from Hong Kong and Taiwan.
-    </p>
-    <a href="/" class="back-link">← Back home</a>
+    <h1>
+      Travels, <em>in long form.</em>
+    </h1>
   </section>
+
+  {
+    posts.length === 0 ? (
+      <section class="empty container">
+        <p>No posts yet — the first journal entries are on their way.</p>
+      </section>
+    ) : (
+      <section class="posts container">
+        {posts.map((post) => (
+          <a href={`/blog/${post.id}`} class="post-card">
+            <div class="post-image">
+              <Image
+                src={post.data.coverImage}
+                alt={post.data.coverAlt}
+                widths={[400, 800, 1200]}
+                sizes="(max-width: 768px) 100vw, 600px"
+                loading="lazy"
+              />
+            </div>
+            <div class="post-body">
+              <div class="post-meta">
+                <span>{post.data.location}</span>
+                <span class="dot">·</span>
+                <span>{formatDate(post.data.pubDate)}</span>
+              </div>
+              <h2 class="post-title">{post.data.title}</h2>
+              <p class="post-excerpt">{post.data.description}</p>
+              <span class="read-more">Read entry →</span>
+            </div>
+          </a>
+        ))}
+      </section>
+    )
+  }
 </BaseLayout>
 
 <style>
-  .placeholder {
-    padding: 200px 48px 120px;
-    max-width: 900px;
+  .header {
+    padding: 180px 48px 60px;
+    max-width: 1200px;
   }
 
   h1 {
     font-family: var(--font-serif);
     font-size: clamp(48px, 7vw, 88px);
     font-weight: 300;
-    line-height: 1.0;
+    line-height: 1;
     letter-spacing: -0.02em;
-    margin: 24px 0 32px;
+    margin-top: 24px;
   }
 
-  .intro-text {
-    font-size: 18px;
+  .empty {
+    padding: 40px 48px 120px;
+    font-style: italic;
     color: var(--text-dim);
-    max-width: 520px;
-    margin-bottom: 48px;
   }
 
-  .back-link {
+  .posts {
+    padding: 40px 48px 120px;
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
+    max-width: 1200px;
+  }
+
+  .post-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    padding: 40px 0;
+    border-top: 1px solid var(--line);
+    transition: transform 0.5s ease;
+  }
+
+  .post-card:hover {
+    transform: translateY(-4px);
+    color: inherit;
+  }
+
+  .post-card:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .post-image {
+    aspect-ratio: 4/5;
+    overflow: hidden;
+    background: var(--bg-elevated);
+  }
+
+  .post-image :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s ease;
+  }
+
+  .post-card:hover .post-image :global(img) {
+    transform: scale(1.03);
+  }
+
+  .post-meta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .dot {
+    color: var(--text-dim);
+  }
+
+  .post-title {
+    font-family: var(--font-serif);
+    font-size: clamp(28px, 3.5vw, 40px);
+    font-weight: 300;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 16px;
+  }
+
+  .post-excerpt {
+    font-size: 17px;
+    color: var(--text-dim);
+    line-height: 1.7;
+    margin-bottom: 24px;
+    max-width: 480px;
+  }
+
+  .read-more {
     font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--accent);
-    border-bottom: 1px solid var(--accent);
-    padding-bottom: 2px;
   }
 
   @media (max-width: 768px) {
-    .placeholder {
-      padding: 140px 24px 80px;
+    .header {
+      padding: 130px 24px 40px;
+    }
+    .posts {
+      padding: 20px 24px 80px;
+      gap: 48px;
+    }
+    .post-card {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .post-excerpt {
+      font-size: 16px;
     }
   }
 </style>
