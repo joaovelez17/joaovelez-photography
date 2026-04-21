@@ -1,53 +1,135 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { galleries } from "../galleries";
 ---
 
 <BaseLayout title="Gallery — JV Photography">
-  <section class="placeholder container">
+  <section class="header container">
     <p class="mono">— Gallery</p>
     <h1>Photos <em>by location.</em></h1>
-    <p class="intro-text">
-      The gallery is being set up. Starting collections: Hong Kong and Taiwan.
+    <p class="subtitle">
+      A collection of places seen through the viewfinder.
     </p>
-    <a href="/" class="back-link">← Back home</a>
+  </section>
+
+  <section class="locations container">
+    {galleries.map((gallery) => (
+      <a href={`/gallery/${gallery.slug}`} class="location-card">
+        <div class="location-image">
+          <img src={gallery.coverImage} alt={gallery.name} loading="lazy" />
+        </div>
+        <div class="location-body">
+          <div class="location-meta">
+            {gallery.photos.length} photos
+          </div>
+          <h2 class="location-name">{gallery.name}</h2>
+          <p class="location-desc">{gallery.description}</p>
+          <span class="view-link">View gallery →</span>
+        </div>
+      </a>
+    ))}
   </section>
 </BaseLayout>
 
 <style>
-  .placeholder {
-    padding: 200px 48px 120px;
-    max-width: 900px;
+  .header {
+    padding: 180px 48px 40px;
+    max-width: 1200px;
   }
 
   h1 {
     font-family: var(--font-serif);
     font-size: clamp(48px, 7vw, 88px);
     font-weight: 300;
-    line-height: 1.0;
+    line-height: 1;
     letter-spacing: -0.02em;
     margin: 24px 0 32px;
   }
 
-  .intro-text {
+  .subtitle {
     font-size: 18px;
     color: var(--text-dim);
+    font-style: italic;
     max-width: 520px;
-    margin-bottom: 48px;
   }
 
-  .back-link {
+  .locations {
+    padding: 60px 48px 120px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 48px;
+    max-width: 1400px;
+  }
+
+  .location-card {
+    display: block;
+    transition: transform 0.5s ease;
+  }
+
+  .location-card:hover {
+    transform: translateY(-6px);
+    color: inherit;
+  }
+
+  .location-image {
+    aspect-ratio: 4/5;
+    overflow: hidden;
+    background: var(--bg-elevated);
+    margin-bottom: 20px;
+  }
+
+  .location-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s ease;
+  }
+
+  .location-card:hover .location-image img {
+    transform: scale(1.04);
+  }
+
+  .location-meta {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 10px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--accent);
-    border-bottom: 1px solid var(--accent);
-    padding-bottom: 2px;
+    margin-bottom: 12px;
+  }
+
+  .location-name {
+    font-family: var(--font-serif);
+    font-size: 32px;
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+
+  .location-desc {
+    font-size: 15px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .view-link {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
   }
 
   @media (max-width: 768px) {
-    .placeholder {
-      padding: 140px 24px 80px;
+    .header {
+      padding: 130px 24px 32px;
+    }
+    .locations {
+      padding: 40px 24px 80px;
+      grid-template-columns: 1fr;
+      gap: 56px;
     }
   }
 </style>

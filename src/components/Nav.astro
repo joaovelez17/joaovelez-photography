@@ -1,7 +1,14 @@
 ---
+import { getCollection } from "astro:content";
+
 const pathname = Astro.url.pathname;
 const isActive = (path: string) =>
   pathname === path || pathname.startsWith(path + "/");
+
+// Get all blog posts for the dropdown
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
 ---
 
 <nav class="nav">
@@ -11,8 +18,24 @@ const isActive = (path: string) =>
   </a>
 
   <ul class="nav-links">
-    <li>
+    <li class="has-dropdown">
       <a href="/blog" class:list={[{ active: isActive("/blog") }]}>Blog</a>
+      {posts.length > 0 && (
+        <div class="dropdown">
+          <div class="dropdown-label">Recent entries</div>
+          <ul class="dropdown-list">
+            {posts.map((post) => (
+              <li>
+                <a href={`/blog/${post.id}`} class="dropdown-item">
+                  <span class="dropdown-title">{post.data.title}</span>
+                  <span class="dropdown-location">{post.data.location}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <a href="/blog" class="dropdown-all">All entries →</a>
+        </div>
+      )}
     </li>
     <li>
       <a href="/gallery" class:list={[{ active: isActive("/gallery") }]}>Gallery</a>
@@ -35,8 +58,8 @@ const isActive = (path: string) =>
     align-items: center;
     z-index: 50;
     background: linear-gradient(to bottom, rgba(10, 10, 10, 0.9), transparent);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
 
   .logo-link {
@@ -78,31 +101,146 @@ const isActive = (path: string) =>
     display: flex;
     gap: 40px;
     list-style: none;
+    align-items: center;
   }
 
-  .nav-links a {
+  .nav-links > li {
+    position: relative;
+  }
+
+  .nav-links > li > a {
     font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--text-dim);
     position: relative;
-    padding: 4px 0;
+    padding: 12px 0;
+    display: block;
   }
 
-  .nav-links a:hover,
-  .nav-links a.active {
+  .nav-links > li > a:hover,
+  .nav-links > li > a.active {
     color: var(--text);
   }
 
-  .nav-links a.active::after {
+  .nav-links > li > a.active::after {
     content: "";
     position: absolute;
-    bottom: -2px;
+    bottom: 8px;
     left: 0;
     right: 0;
     height: 1px;
     background: var(--accent);
+  }
+
+  /* Dropdown */
+  .has-dropdown {
+    position: relative;
+  }
+
+  .dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 320px;
+    background: rgba(15, 15, 15, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--line);
+    padding: 24px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+    pointer-events: none;
+  }
+
+  /* Bridge to prevent the dropdown from closing when moving from trigger to dropdown */
+  .has-dropdown::before {
+    content: "";
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 100%;
+    height: 16px;
+  }
+
+  .has-dropdown:hover .dropdown,
+  .has-dropdown:focus-within .dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .dropdown-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .dropdown-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .dropdown-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px;
+    border-radius: 2px;
+    transition: background 0.2s ease;
+    margin: 0 -12px;
+  }
+
+  .dropdown-item:hover {
+    background: rgba(140, 168, 150, 0.08);
+    color: inherit;
+  }
+
+  .dropdown-title {
+    font-family: var(--font-serif);
+    font-size: 15px;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--text);
+    line-height: 1.3;
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
+  .dropdown-location {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .dropdown-all {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    display: block;
+  }
+
+  .dropdown-all:hover {
+    color: var(--text);
   }
 
   @media (max-width: 768px) {
@@ -118,9 +256,14 @@ const isActive = (path: string) =>
       gap: 20px;
     }
 
-    .nav-links a {
+    .nav-links > li > a {
       font-size: 10px;
       letter-spacing: 0.15em;
+    }
+
+    /* Hide dropdown on mobile (hover doesn't work well) */
+    .dropdown {
+      display: none;
     }
   }
 </style>

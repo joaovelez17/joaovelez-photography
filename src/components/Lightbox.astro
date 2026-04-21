@@ -13,7 +13,7 @@
   const closeBtn = lightbox?.querySelector(".close") as HTMLButtonElement;
 
   // Find all images in post figures and make them clickable
-  document.querySelectorAll(".post-content figure img").forEach((img) => {
+  document.querySelectorAll(".post-content figure img, .grid figure img").forEach((img) => {
     const image = img as HTMLImageElement;
     image.style.cursor = "zoom-in";
     image.addEventListener("click", () => {

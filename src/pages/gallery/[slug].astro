@@ -1,0 +1,138 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Lightbox from "../../components/Lightbox.astro";
+import { galleries } from "../../galleries";
+
+export async function getStaticPaths() {
+  return galleries.map((gallery) => ({
+    params: { slug: gallery.slug },
+    props: { gallery },
+  }));
+}
+
+const { gallery } = Astro.props;
+---
+
+<BaseLayout title={`${gallery.name} — Gallery`} description={gallery.description}>
+  <section class="header container">
+    <p class="mono">— {gallery.name}</p>
+    <h1>{gallery.name}.</h1>
+    <p class="subtitle">{gallery.description}</p>
+    <p class="count">{gallery.photos.length} photos</p>
+  </section>
+
+  <section class="grid">
+    {gallery.photos.map((photo) => (
+      <figure class="grid-item">
+        <img
+          src={`/photos/${gallery.slug}/${photo}`}
+          alt={`${gallery.name} photo`}
+          loading="lazy"
+        />
+      </figure>
+    ))}
+  </section>
+
+  <section class="footer-nav container">
+    <a href="/gallery" class="back-link">← All galleries</a>
+  </section>
+
+  <Lightbox />
+</BaseLayout>
+
+<style>
+  .header {
+    padding: 180px 48px 40px;
+    max-width: 1200px;
+  }
+
+  h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(48px, 7vw, 88px);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin: 24px 0 32px;
+  }
+
+  .subtitle {
+    font-size: 18px;
+    color: var(--text-dim);
+    font-style: italic;
+    max-width: 520px;
+    margin-bottom: 16px;
+  }
+
+  .count {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .grid {
+    padding: 40px 24px 80px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    max-width: 1800px;
+    margin: 0 auto;
+  }
+
+  .grid-item {
+    margin: 0;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: var(--bg-elevated);
+    cursor: zoom-in;
+  }
+
+  .grid-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease, opacity 0.3s ease;
+  }
+
+  .grid-item:hover img {
+    transform: scale(1.03);
+    opacity: 0.9;
+  }
+
+  .footer-nav {
+    padding: 48px 48px 0;
+    max-width: 1400px;
+  }
+
+  .back-link {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .back-link:hover {
+    color: var(--accent);
+  }
+
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .header {
+      padding: 130px 24px 32px;
+    }
+    .grid {
+      padding: 32px 16px 60px;
+      gap: 4px;
+    }
+    .footer-nav {
+      padding: 40px 24px 0;
+    }
+  }
+</style>
